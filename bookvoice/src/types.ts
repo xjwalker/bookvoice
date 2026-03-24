@@ -1,4 +1,5 @@
-export interface Book {
+/** Lightweight metadata kept in memory / library state (no chunk text). */
+export interface BookMeta {
   id: string;
   title: string;
   author?: string;
@@ -6,7 +7,7 @@ export interface Book {
   coverImageUri?: string;
   totalPages: number;
   totalChunks: number;
-  chunks: TextChunk[];
+  totalCharCount: number;
   createdAt: number;
   lastOpenedAt: number;
   ocrStatus: 'pending' | 'processing' | 'done' | 'error';
@@ -15,6 +16,12 @@ export interface Book {
   sourceType?: 'pdf' | 'preprocessed' | 'sample';
   language?: string;
   chapters?: ChapterMark[];
+  tags?: string[];
+}
+
+/** Full book with chunks — only loaded when opening the player. */
+export interface Book extends BookMeta {
+  chunks: TextChunk[];
 }
 
 export interface ChapterMark {
@@ -34,14 +41,17 @@ export interface TextChunk {
 
 export interface PlaybackState {
   bookId: string;
+  title: string;
+  coverColor: string;
+  coverImageUri?: string;
   chunkIndex: number;
+  totalChunks: number;
   isPlaying: boolean;
   playbackRate: number;
-  lastUpdated: number;
 }
 
 export interface BookLibrary {
-  [bookId: string]: Book;
+  [bookId: string]: BookMeta;
 }
 
 export interface PlaybackProgress {
@@ -49,4 +59,18 @@ export interface PlaybackProgress {
     chunkIndex: number;
     lastUpdated: number;
   };
+}
+
+export type AppTheme = 'dark' | 'dim' | 'light' | 'sepia';
+export type LibraryView = 'grid' | 'list';
+
+export interface UserSettings {
+  voiceId?: string;
+  textSize: number;       // 14–24
+  accentColor: string;    // hex
+  appTheme: AppTheme;
+  libraryView: LibraryView;
+  // Legacy — kept for migration, derived from appTheme going forward
+  readerBgColor?: string;
+  readerTextColor?: string;
 }

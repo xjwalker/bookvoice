@@ -87,7 +87,7 @@ export function updateNowPlaying(opts: {
   try {
     nativeUpdateNowPlaying({
       title: opts.chapter || opts.title,
-      artist: opts.artist || 'BookVoice',
+      artist: opts.artist || 'ReadItForMe',
       album: opts.title,
       duration: opts.totalChunks,
       elapsedTime: opts.currentChunk,

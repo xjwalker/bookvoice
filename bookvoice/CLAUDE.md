@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BookVoice is a React Native (Expo) mobile app that converts scanned PDFs into audiobooks via OCR and text-to-speech. Dark-themed UI, targets iOS and Android.
+ReadItForMe (formerly BookVoice) is a React Native (Expo) mobile app that converts scanned PDFs into audiobooks via OCR and text-to-speech. Themeable UI (Dark/Dim/Light/Sepia), targets iOS and Android.
 
 ## Common Commands
 
