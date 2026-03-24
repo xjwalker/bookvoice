@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "BookVoice",
+    "slug": "bookvoice",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": { "backgroundColor": "#0a0a0f" },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bookvoice.app",
+      "infoPlist": {
+        "UIFileSharingEnabled": true,
+        "LSSupportsOpeningDocumentsInPlace": true,
+        "UIBackgroundModes": ["audio"]
+      }
+    },
+    "android": {
+      "adaptiveIcon": { "backgroundColor": "#0a0a0f" },
+      "package": "com.bookvoice.app",
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+    },
+    "plugins": ["expo-router", "expo-document-picker"],
+    "scheme": "bookvoice"
+  }
+}
