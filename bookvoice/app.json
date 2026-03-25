@@ -4,8 +4,13 @@
     "slug": "readitforme",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": { "backgroundColor": "#0a0a0f" },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0f"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.xjwalker.readitforme",
@@ -16,11 +21,14 @@
       }
     },
     "android": {
-      "adaptiveIcon": { "backgroundColor": "#0a0a0f" },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a0a0f"
+      },
       "package": "com.xjwalker.readitforme",
       "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
     },
-    "plugins": ["expo-router", "expo-document-picker"],
+    "plugins": ["expo-router", "expo-document-picker", "expo-splash-screen"],
     "scheme": "readitforme"
   }
 }
