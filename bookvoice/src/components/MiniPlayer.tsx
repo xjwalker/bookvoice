@@ -18,19 +18,25 @@ export default function MiniPlayer({ nowPlaying, accent, theme: t, onTap }: Prop
     : 0;
 
   return (
-    <TouchableOpacity style={[styles.container, { backgroundColor: t.surface, borderTopColor: t.border }]} onPress={onTap} activeOpacity={0.8}>
-      <View style={styles.progressBar}>
+    <TouchableOpacity
+      style={[styles.container, { backgroundColor: t.surface, borderTopColor: t.border }]}
+      onPress={onTap} activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={`Now playing: ${nowPlaying.title}, section ${nowPlaying.chunkIndex + 1} of ${nowPlaying.totalChunks}`}
+      accessibilityHint="Double tap to open player"
+    >
+      <View style={styles.progressBar} accessibilityElementsHidden>
         <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
       </View>
       <View style={styles.content}>
         {nowPlaying.coverImageUri ? (
-          <Image source={{ uri: nowPlaying.coverImageUri }} style={[styles.cover, { backgroundColor: nowPlaying.coverColor }]} />
+          <Image source={{ uri: nowPlaying.coverImageUri }} style={[styles.cover, { backgroundColor: nowPlaying.coverColor }]} accessibilityElementsHidden />
         ) : (
-          <View style={[styles.cover, { backgroundColor: nowPlaying.coverColor }]}>
+          <View style={[styles.cover, { backgroundColor: nowPlaying.coverColor }]} accessibilityElementsHidden>
             <Text style={styles.coverLetter}>{nowPlaying.title.charAt(0).toUpperCase()}</Text>
           </View>
         )}
-        <View style={styles.info}>
+        <View style={styles.info} accessibilityElementsHidden>
           <Text style={[styles.title, { color: t.textPrimary }]} numberOfLines={1}>{nowPlaying.title}</Text>
           <Text style={[styles.meta, { color: t.textDim }]}>
             §{nowPlaying.chunkIndex + 1}/{nowPlaying.totalChunks}
@@ -38,7 +44,10 @@ export default function MiniPlayer({ nowPlaying, accent, theme: t, onTap }: Prop
         </View>
         <TouchableOpacity
           style={[styles.stopBtn, { backgroundColor: accent }]}
-          onPress={(e) => { e.stopPropagation(); TTS.stop(); }}>
+          onPress={(e) => { e.stopPropagation(); TTS.stop(); }}
+          accessibilityRole="button"
+          accessibilityLabel="Stop playback"
+        >
           <Ionicons name="stop" size={16} color="#fff" />
         </TouchableOpacity>
       </View>

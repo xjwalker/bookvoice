@@ -343,39 +343,39 @@ export default function PlayerScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle={theme.statusBar} backgroundColor={theme.bg} />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} accessibilityRole="button" accessibilityLabel="Go back to library">
           <Ionicons name="chevron-back" size={24} color={theme.textSecondary} />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <TouchableOpacity onPress={() => setShowSettings(true)} style={[styles.indexBtn, { backgroundColor: theme.surface }]}>
+          <TouchableOpacity onPress={() => setShowSettings(true)} style={[styles.indexBtn, { backgroundColor: theme.surface }]} accessibilityRole="button" accessibilityLabel="Settings">
             <Ionicons name="settings-outline" size={18} color={theme.textPrimary} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowIndex(true)} style={[styles.indexBtn, { backgroundColor: theme.surface }]}>
+          <TouchableOpacity onPress={() => setShowIndex(true)} style={[styles.indexBtn, { backgroundColor: theme.surface }]} accessibilityRole="button" accessibilityLabel="Open book index">
             <Ionicons name="list" size={20} color={theme.textPrimary} />
             <Text style={[styles.indexBtnText, { color: theme.textPrimary }]}>Index</Text>
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.coverSection}>
-        <TouchableOpacity onPress={handlePickCover} style={[styles.coverArt, { backgroundColor: book.coverColor }]}>
+        <TouchableOpacity onPress={handlePickCover} style={[styles.coverArt, { backgroundColor: book.coverColor }]} accessibilityRole="button" accessibilityLabel={`Cover art for ${book.title}. Double tap to change`}>
           {book.coverImageUri ? (
-            <Image source={{ uri: book.coverImageUri }} style={styles.coverImage} />
+            <Image source={{ uri: book.coverImageUri }} style={styles.coverImage} accessibilityElementsHidden />
           ) : (
-            <Text style={styles.coverLetter}>{book.title.charAt(0).toUpperCase()}</Text>
+            <Text style={styles.coverLetter} accessibilityElementsHidden>{book.title.charAt(0).toUpperCase()}</Text>
           )}
-          <View style={styles.coverEditBadge}>
+          <View style={styles.coverEditBadge} accessibilityElementsHidden>
             <Ionicons name="camera" size={12} color="#fff" />
           </View>
         </TouchableOpacity>
         <Text style={[styles.bookTitle, { color: theme.textPrimary }]} numberOfLines={2}>{book.title}</Text>
         {currentChapter && (
-          <TouchableOpacity onPress={() => setShowIndex(true)} style={[styles.chapterBar, { backgroundColor: theme.surface }]}>
+          <TouchableOpacity onPress={() => setShowIndex(true)} style={[styles.chapterBar, { backgroundColor: theme.surface }]} accessibilityRole="button" accessibilityLabel={`Current chapter: ${currentChapter.title}. Double tap to open index`}>
             <Ionicons name="bookmark" size={14} color={accent} />
             <Text style={[styles.chapterLabel, { color: accent }]} numberOfLines={1}>{currentChapter.title}</Text>
             <Ionicons name="chevron-forward" size={14} color={theme.textDim} />
           </TouchableOpacity>
         )}
-        <Text style={[styles.bookMeta, { color: theme.textDim }]}>Page {currentPage} · §{currentChunk + 1}/{totalChunks} · ~{remainingMins}m left</Text>
+        <Text style={[styles.bookMeta, { color: theme.textDim }]} accessibilityLabel={`Page ${currentPage}, section ${currentChunk + 1} of ${totalChunks}, about ${remainingMins} minutes left`}>Page {currentPage} · §{currentChunk + 1}/{totalChunks} · ~{remainingMins}m left</Text>
       </View>
       <ScrollView
         ref={textScrollRef}
@@ -396,26 +396,26 @@ export default function PlayerScreen() {
           fontSize={settings.textSize}
         />
       </ScrollView>
-      <View style={styles.progressContainer}>
+      <View style={styles.progressContainer} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max: 100, now: Math.round(progress * 100) }} accessibilityLabel={`Progress: ${Math.round(progress * 100)}% of ${totalChunks} sections`}>
         <View style={[styles.progressTrack, { backgroundColor: theme.surface }]}>
           <View style={[styles.progressFill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
         </View>
-        <View style={styles.progressLabels}>
+        <View style={styles.progressLabels} accessibilityElementsHidden>
           <Text style={[styles.progressLabel, { color: theme.textMuted }]}>{Math.round(progress * 100)}%</Text>
           <Text style={[styles.progressLabel, { color: theme.textMuted }]}>{totalChunks} sections</Text>
         </View>
       </View>
-      <View style={styles.controls}>
-        <TouchableOpacity onPress={() => setShowSpeedPicker(true)} style={styles.speedBtn}>
+      <View style={styles.controls} accessibilityRole="toolbar" accessibilityLabel="Playback controls">
+        <TouchableOpacity onPress={() => setShowSpeedPicker(true)} style={styles.speedBtn} accessibilityRole="button" accessibilityLabel={`Playback speed ${SPEEDS[speedIndex]} times. Double tap to change`}>
           <Text style={[styles.speedText, { color: accent }]}>{SPEEDS[speedIndex]}×</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handlePrev} style={styles.controlBtn}>
+        <TouchableOpacity onPress={handlePrev} style={styles.controlBtn} accessibilityRole="button" accessibilityLabel="Previous section">
           <Ionicons name="play-skip-back" size={28} color={theme.readerText} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handlePlayPause} style={[styles.playBtn, { backgroundColor: theme.textPrimary }]}>
+        <TouchableOpacity onPress={handlePlayPause} style={[styles.playBtn, { backgroundColor: theme.textPrimary }]} accessibilityRole="button" accessibilityLabel={isPlaying ? 'Pause' : 'Play'}>
           <Ionicons name={isPlaying ? 'pause' : 'play'} size={32} color={theme.bg} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleNext} style={styles.controlBtn}>
+        <TouchableOpacity onPress={handleNext} style={styles.controlBtn} accessibilityRole="button" accessibilityLabel="Next section">
           <Ionicons name="play-skip-forward" size={28} color={theme.readerText} />
         </TouchableOpacity>
         <View style={styles.speedBtn} />
@@ -558,7 +558,7 @@ function BookIndex({ visible, chunks, chapters, currentIndex, accentColor, cover
                 </TouchableOpacity>
               </View>
             )}
-            <TouchableOpacity onPress={onClose} style={{ padding: 4 }}>
+            <TouchableOpacity onPress={onClose} style={{ padding: 4 }} accessibilityRole="button" accessibilityLabel="Close index">
               <Ionicons name="close" size={24} color={t.textSecondary} />
             </TouchableOpacity>
           </View>

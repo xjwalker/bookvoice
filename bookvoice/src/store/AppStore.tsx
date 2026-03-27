@@ -2,6 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, useMemo, React
 import { BookMeta, BookLibrary, PlaybackProgress, PlaybackState, UserSettings } from '../types';
 import { getTheme, Theme } from '../theme';
 import * as Storage from '../services/storage';
+import { preloadBiblesIfNeeded } from '../services/biblePreload';
 
 const DEFAULT_SETTINGS: UserSettings = {
   textSize: 16,
@@ -67,6 +68,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           Storage.loadLibrary(), Storage.loadProgress(), Storage.loadSettings(),
         ]);
         dispatch({ type: 'INIT', library, progress, settings: settings ?? DEFAULT_SETTINGS });
+        // Preload bundled Bibles on first launch (non-blocking)
+        preloadBiblesIfNeeded(dispatch).catch(() => {});
       } catch {
         // If storage is corrupted, start fresh
         dispatch({ type: 'INIT', library: {}, progress: {}, settings: DEFAULT_SETTINGS });

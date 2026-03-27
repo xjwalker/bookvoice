@@ -50,7 +50,7 @@ export default function SettingsModal({ visible, settings, theme, bookLanguage, 
           <Text style={s.hint}>
             For better voices: Settings → Accessibility → Spoken Content → Voices → download Enhanced/Premium
           </Text>
-          <TouchableOpacity style={s.voiceBtn} onPress={() => setShowVoices(!showVoices)}>
+          <TouchableOpacity style={s.voiceBtn} onPress={() => setShowVoices(!showVoices)} accessibilityRole="button" accessibilityLabel={`Voice: ${settings.voiceId ? voices.find((v: any) => v.identifier === settings.voiceId)?.name ?? settings.voiceId : 'System Default'}. Double tap to change`}>
             <Ionicons name="mic-outline" size={18} color={theme.textPrimary} />
             <Text style={s.voiceBtnText} numberOfLines={1}>
               {settings.voiceId
@@ -99,7 +99,11 @@ export default function SettingsModal({ visible, settings, theme, bookLanguage, 
               <TouchableOpacity
                 key={sz}
                 style={[s.sizeBtn, settings.textSize === sz && { backgroundColor: accent }]}
-                onPress={() => onUpdate({ textSize: sz })}>
+                onPress={() => onUpdate({ textSize: sz })}
+                accessibilityRole="button"
+                accessibilityLabel={`Text size ${sz}`}
+                accessibilityState={{ selected: settings.textSize === sz }}
+              >
                 <Text style={[s.sizeBtnText, settings.textSize === sz && { color: '#fff' }]}>{sz}</Text>
               </TouchableOpacity>
             ))}
@@ -108,13 +112,19 @@ export default function SettingsModal({ visible, settings, theme, bookLanguage, 
           {/* Accent Color */}
           <Text style={s.label}>Accent Color</Text>
           <View style={s.colorRow}>
-            {ACCENT_COLORS.map(c => (
-              <TouchableOpacity
-                key={c}
-                style={[s.colorBtn, { backgroundColor: c }, accent === c && s.colorBtnActive]}
-                onPress={() => onUpdate({ accentColor: c })}
-              />
-            ))}
+            {ACCENT_COLORS.map((c, i) => {
+              const colorNames = ['Red', 'Blue', 'Green', 'Purple', 'Orange', 'Yellow', 'Teal', 'Coral'];
+              return (
+                <TouchableOpacity
+                  key={c}
+                  style={[s.colorBtn, { backgroundColor: c }, accent === c && s.colorBtnActive]}
+                  onPress={() => onUpdate({ accentColor: c })}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${colorNames[i] || 'Color'} accent`}
+                  accessibilityState={{ selected: accent === c }}
+                />
+              );
+            })}
           </View>
 
           {/* App Theme */}
@@ -127,7 +137,11 @@ export default function SettingsModal({ visible, settings, theme, bookLanguage, 
                   backgroundColor: t.key === 'dark' ? '#0a0a0f' : t.key === 'dim' ? '#1a1a24' : t.key === 'light' ? '#f5f0e8' : '#fdf6e3',
                   borderColor: settings.appTheme === t.key ? accent : theme.border,
                 }]}
-                onPress={() => onUpdate({ appTheme: t.key })}>
+                onPress={() => onUpdate({ appTheme: t.key })}
+                accessibilityRole="button"
+                accessibilityLabel={`${t.label} theme`}
+                accessibilityState={{ selected: settings.appTheme === t.key }}
+              >
                 <Text style={[s.themeBtnText, {
                   color: (t.key === 'light' || t.key === 'sepia') ? '#3c3c3c' : '#d4ccbc',
                 }]}>{t.label}</Text>

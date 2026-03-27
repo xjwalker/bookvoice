@@ -140,13 +140,19 @@ export default function LibraryScreen() {
                 const next = isGrid ? 'list' as const : 'grid' as const;
                 dispatch({ type: 'UPDATE_SETTINGS', settings: { libraryView: next } });
                 saveSettings({ ...settings, libraryView: next });
-              }}>
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={isGrid ? 'Switch to list view' : 'Switch to grid view'}
+            >
               <Ionicons name={isGrid ? 'list' : 'grid'} size={18} color={theme.textPrimary} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
             style={[styles.headerBtn, { backgroundColor: theme.surface }]}
-            onPress={() => setShowSettings(true)}>
+            onPress={() => setShowSettings(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+          >
             <Ionicons name="settings-outline" size={18} color={theme.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -229,7 +235,13 @@ export default function LibraryScreen() {
           onTap={() => router.push(`/player/${nowPlaying.bookId}`)}
         />
       )}
-      <TouchableOpacity style={[styles.fab, { backgroundColor: accent, bottom: nowPlaying?.isPlaying ? 100 : 32 }, importing && styles.fabDisabled]} onPress={handleImport} disabled={importing}>
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: accent, bottom: nowPlaying?.isPlaying ? 100 : 32 }, importing && styles.fabDisabled]}
+        onPress={handleImport} disabled={importing}
+        accessibilityRole="button"
+        accessibilityLabel={importing ? 'Importing book' : 'Import a book'}
+        accessibilityState={{ busy: importing }}
+      >
         {importing ? <ActivityIndicator color="#fff" /> : <Ionicons name="add" size={28} color="#fff" />}
       </TouchableOpacity>
       <SettingsModal
@@ -254,8 +266,13 @@ const BookCard = memo(function BookCard({ book, theme: t, accent, onPress, onDel
   const progressPct = hasProgress ? Math.round((progress / book.totalChunks) * 100) : 0;
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
-      <View style={[styles.cover, { backgroundColor: book.coverColor }]}>
+    <TouchableOpacity
+      style={styles.card} onPress={onPress} activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={`${book.title}${book.author ? ` by ${book.author}` : ''}${isProcessing ? `, processing ${book.ocrProgress}%` : ''}${hasProgress ? `, ${progressPct}% complete` : ''}${!isProcessing && book.totalChunks > 0 ? `, about ${estimateMinutes(totalChars)} minutes` : ''}`}
+      accessibilityHint="Double tap to open"
+    >
+      <View style={[styles.cover, { backgroundColor: book.coverColor }]} accessibilityElementsHidden>
         {book.coverImageUri && !isProcessing ? (
           <Image source={{ uri: book.coverImageUri }} style={styles.coverImage} />
         ) : isProcessing ? (
@@ -274,11 +291,15 @@ const BookCard = memo(function BookCard({ book, theme: t, accent, onPress, onDel
             <Text style={styles.progressBadgeText}>{progressPct}%</Text>
           </View>
         )}
-        <TouchableOpacity style={styles.deleteBtn} onPress={onDelete} hitSlop={8}>
+        <TouchableOpacity
+          style={styles.deleteBtn} onPress={onDelete} hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${book.title}`}
+        >
           <Ionicons name="close-circle" size={22} color="rgba(255,255,255,0.8)" />
         </TouchableOpacity>
       </View>
-      <View style={styles.cardInfo}>
+      <View style={styles.cardInfo} accessibilityElementsHidden>
         <Text style={[styles.cardTitle, { color: t.textPrimary }]} numberOfLines={2}>{book.title}</Text>
         {book.author ? <Text style={[styles.cardAuthor, { color: t.textDim }]} numberOfLines={1}>{book.author}</Text> : null}
         {!isProcessing && book.totalChunks > 0 && (
@@ -301,15 +322,20 @@ const BookListItem = memo(function BookListItem({ book, theme: t, accent, onPres
   const progressPct = hasProgress ? Math.round((progress / book.totalChunks) * 100) : 0;
 
   return (
-    <TouchableOpacity style={[styles.listItem, { borderBottomColor: t.border }]} onPress={onPress} activeOpacity={0.8}>
-      <View style={[styles.listCover, { backgroundColor: book.coverColor }]}>
+    <TouchableOpacity
+      style={[styles.listItem, { borderBottomColor: t.border }]} onPress={onPress} activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={`${book.title}${book.author ? ` by ${book.author}` : ''}${isProcessing ? `, processing ${book.ocrProgress}%` : ''}${hasProgress ? `, ${progressPct}% complete` : ''}${!isProcessing && book.totalChunks > 0 ? `, about ${estimateMinutes(totalChars)} minutes` : ''}`}
+      accessibilityHint="Double tap to open"
+    >
+      <View style={[styles.listCover, { backgroundColor: book.coverColor }]} accessibilityElementsHidden>
         {book.coverImageUri && !isProcessing ? (
           <Image source={{ uri: book.coverImageUri }} style={styles.listCoverImage} />
         ) : (
           <Text style={styles.listCoverInitial}>{book.title.charAt(0).toUpperCase()}</Text>
         )}
       </View>
-      <View style={styles.listInfo}>
+      <View style={styles.listInfo} accessibilityElementsHidden>
         <Text style={[styles.listTitle, { color: t.textPrimary }]} numberOfLines={1}>{book.title}</Text>
         {book.author ? <Text style={[styles.listAuthor, { color: t.textSecondary }]} numberOfLines={1}>{book.author}</Text> : null}
         <View style={styles.listMeta}>
@@ -322,7 +348,11 @@ const BookListItem = memo(function BookListItem({ book, theme: t, accent, onPres
           {isProcessing && <Text style={[styles.listMetaText, { color: t.textDim }]}>Processing… {book.ocrProgress}%</Text>}
         </View>
       </View>
-      <TouchableOpacity onPress={onDelete} hitSlop={8} style={{ padding: 4 }}>
+      <TouchableOpacity
+        onPress={onDelete} hitSlop={8} style={{ padding: 4 }}
+        accessibilityRole="button"
+        accessibilityLabel={`Remove ${book.title}`}
+      >
         <Ionicons name="trash-outline" size={18} color={t.textMuted} />
       </TouchableOpacity>
     </TouchableOpacity>
