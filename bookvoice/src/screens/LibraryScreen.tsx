@@ -14,6 +14,7 @@ import { saveBookMeta, saveChunks, saveSettings, deleteBook as deleteBookStorage
 import { chunkText } from '../services/ocr';
 import { processPdf } from '../services/pdfProcessor';
 import { extractCover } from '../services/coverExtractor';
+import { BUNDLED_BIBLES, importBibleBundle } from '../services/biblePreload';
 import SettingsModal from '../components/SettingsModal';
 import MiniPlayer from '../components/MiniPlayer';
 // DEV: bundled sample books for testing
@@ -197,6 +198,7 @@ export default function LibraryScreen() {
           <Ionicons name="book-outline" size={64} color={theme.textMuted} />
           <Text style={[styles.emptyTitle, { color: theme.textMuted }]}>No books yet</Text>
           <Text style={[styles.emptySub, { color: theme.textDim }]}>Tap + to import a scanned PDF{'\n'}or a preprocessed .bookvoice.json</Text>
+          <BibleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} isDuplicate={isDuplicate} />
           {__DEV__ && <SampleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} onLoadSample={handleLoadSample} isDuplicate={isDuplicate} />}
         </View>
       ) : isGrid ? (
@@ -207,7 +209,10 @@ export default function LibraryScreen() {
           maxToRenderPerBatch={8}
           windowSize={5}
           ListHeaderComponent={
-            __DEV__ ? <SampleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} onLoadSample={handleLoadSample} isDuplicate={isDuplicate} /> : undefined
+            <>
+              <BibleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} isDuplicate={isDuplicate} />
+              {__DEV__ && <SampleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} onLoadSample={handleLoadSample} isDuplicate={isDuplicate} />}
+            </>
           }
           renderItem={({ item }) => (
             <BookCard book={item} theme={theme} accent={accent} onPress={() => handleOpenBook(item)} onDelete={() => handleDeleteBook(item)} />
@@ -220,7 +225,12 @@ export default function LibraryScreen() {
           contentContainerStyle={styles.listContent}
           maxToRenderPerBatch={12}
           windowSize={7}
-          ListHeaderComponent={__DEV__ ? <SampleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} onLoadSample={handleLoadSample} isDuplicate={isDuplicate} /> : undefined}
+          ListHeaderComponent={
+            <>
+              <BibleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} isDuplicate={isDuplicate} />
+              {__DEV__ && <SampleButtons accent={accent} theme={theme} importing={importing} dispatch={dispatch} setImporting={setImporting} onLoadSample={handleLoadSample} isDuplicate={isDuplicate} />}
+            </>
+          }
           renderItem={({ item }) => (
             <BookListItem book={item} theme={theme} accent={accent} onPress={() => handleOpenBook(item)} onDelete={() => handleDeleteBook(item)} />
           )}
@@ -380,6 +390,45 @@ function SampleButtons({ accent, theme: t, importing, dispatch, setImporting, on
       <TouchableOpacity style={[styles.sampleBtn, { backgroundColor: t.surface }]} onPress={() => loadBundle(amarODependerData)} disabled={importing}>
         <Text style={[styles.sampleBtnText, { color: accent }]}>+ Amar</Text>
       </TouchableOpacity>
+    </View>
+  );
+}
+
+// Bible loader buttons — always visible when Bibles aren't in the library yet
+function BibleButtons({ accent, theme: t, importing, dispatch, setImporting, isDuplicate }: any) {
+  const loadBible = (bible: typeof BUNDLED_BIBLES[number]) => {
+    if (isDuplicate?.(bible.title)) { Alert.alert('Already imported', `"${bible.title}" is already in your library.`); return; }
+    setImporting(true);
+    try {
+      const bundle = bible.loader();
+      importBibleBundle(bundle, bible, dispatch)
+        .catch((e: any) => Alert.alert('Import failed', e.message))
+        .finally(() => setImporting(false));
+    } catch (e: any) {
+      Alert.alert('Import failed', e.message);
+      setImporting(false);
+    }
+  };
+
+  // Only show buttons for Bibles not yet in the library
+  const available = BUNDLED_BIBLES.filter(b => !isDuplicate?.(b.title));
+  if (available.length === 0) return null;
+
+  return (
+    <View style={styles.sampleRow}>
+      <Ionicons name="book" size={16} color={t.textDim} />
+      {available.map(bible => (
+        <TouchableOpacity
+          key={bible.key}
+          style={[styles.sampleBtn, { backgroundColor: t.surface }]}
+          onPress={() => loadBible(bible)}
+          disabled={importing}
+          accessibilityRole="button"
+          accessibilityLabel={`Add ${bible.title}`}
+        >
+          <Text style={[styles.sampleBtnText, { color: accent }]}>+ {bible.key === 'kjv' ? 'Bible KJV' : 'Biblia RVA'}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 }

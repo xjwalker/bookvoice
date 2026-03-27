@@ -4,22 +4,24 @@ import { generateId, generateCoverColor } from '../utils/id';
 import { chunkText } from './ocr';
 import { saveBookMeta, saveChunks, loadLibrary } from './storage';
 
-const BIBLES_LOADED_KEY = 'bookvoice_bibles_loaded_v1';
+const BIBLES_LOADED_KEY = 'bookvoice_bibles_loaded_v2';
 
-interface BibleDef {
+export interface BibleDef {
+  key: string;
   title: string;
   language: string;
   loader: () => any;
 }
 
-const BUNDLED_BIBLES: BibleDef[] = [
+export const BUNDLED_BIBLES: BibleDef[] = [
   {
+    key: 'kjv',
     title: 'Holy Bible (KJV)',
     language: 'en-US',
-    // Lazy require — JSON is only parsed when loader() is called
     loader: () => require('../../assets/bible-kjv.bookvoice.json'),
   },
   {
+    key: 'rva1909',
     title: 'Santa Biblia (Reina-Valera 1909)',
     language: 'es',
     loader: () => require('../../assets/bible-rva1909.bookvoice.json'),
@@ -33,33 +35,37 @@ const BUNDLED_BIBLES: BibleDef[] = [
 export async function preloadBiblesIfNeeded(
   dispatch: (action: any) => void,
 ): Promise<void> {
-  try {
-    const loaded = await AsyncStorage.getItem(BIBLES_LOADED_KEY);
-    if (loaded) return;
+  const loaded = await AsyncStorage.getItem(BIBLES_LOADED_KEY);
+  if (loaded) return;
 
-    const library = await loadLibrary();
-    const existingTitles = new Set(Object.values(library).map(b => b.title));
+  const library = await loadLibrary();
+  const existingTitles = new Set(Object.values(library).map(b => b.title));
+  let allSucceeded = true;
 
-    for (const bible of BUNDLED_BIBLES) {
-      if (existingTitles.has(bible.title)) continue;
+  for (const bible of BUNDLED_BIBLES) {
+    if (existingTitles.has(bible.title)) continue;
 
-      try {
-        const bundle = bible.loader();
-        await importBibleBundle(bundle, bible, dispatch);
-      } catch (err) {
-        console.warn(`Failed to preload ${bible.title}:`, err);
-      }
+    try {
+      const bundle = bible.loader();
+      await importBibleBundle(bundle, bible, dispatch);
+    } catch (err) {
+      console.warn(`Failed to preload ${bible.title}:`, err);
+      allSucceeded = false;
     }
+  }
 
+  // Only mark as done if all succeeded — retry on next launch otherwise
+  if (allSucceeded) {
     await AsyncStorage.setItem(BIBLES_LOADED_KEY, Date.now().toString());
-  } catch (err) {
-    console.warn('Bible preload failed:', err);
   }
 }
 
-async function importBibleBundle(
+/**
+ * Import a single Bible bundle. Exported so it can be called from UI buttons.
+ */
+export async function importBibleBundle(
   bundle: any,
-  bible: BibleDef,
+  bible: { title: string; language: string },
   dispatch: (action: any) => void,
 ): Promise<void> {
   const bookId = generateId();
